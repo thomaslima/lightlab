@@ -393,7 +393,7 @@ class Keithley_2606B_SMU(VISAInstrumentDriver):
         type_str = self.query_print(f"{self.smu_full_string}.measure.filter.type")
         count_str = self.query_print(f"{self.smu_full_string}.measure.filter.count")
         
-        return True if int(enable_str) else False, filters[int(type_str)], int(count_str)
+        return True if int(float(enable_str)) else False, filters[int(float(type_str))], int(float(count_str))
     
     def enableFilter(self):
         self.write(f"{self.smu_full_string}.measure.filter.enable = {self.smu_full_string}.FILTER_ON")
