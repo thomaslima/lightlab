@@ -261,12 +261,12 @@ class PrologixGPIBObject(InstrumentSessionBase):
             pconn.send('++addr {}'.format(self._prologix_gpib_addr_formatted()))
             pconn.send(self._prologix_escape_characters(writeStr))
 
-    def query(self, queryStr, withTimeout=None):
+    def query(self, queryStr, withTimeout=None, wait_time=0):
         '''Read the unmodified string sent from the instrument to the
            computer.
         '''
         logger.debug('%s - Q - %s', self.address, queryStr)
-        retStr = self.query_raw_binary(queryStr, withTimeout)
+        retStr = self.query_raw_binary(queryStr, withTimeout, wait_time)
         logger.debug('Query Read - %s', repr(retStr))
         return retStr.rstrip()
 
@@ -279,7 +279,7 @@ class PrologixGPIBObject(InstrumentSessionBase):
             pconn.send('++addr {}'.format(self._prologix_gpib_addr_formatted()))
             pconn.send('++clr')
 
-    def query_raw_binary(self, queryStr, withTimeout=None):
+    def query_raw_binary(self, queryStr, withTimeout=None, wait_time=0):
         '''Read the unmodified string sent from the instrument to the
            computer. In contrast to query(), no termination characters
            are stripped. Also no decoding.'''
@@ -291,6 +291,9 @@ class PrologixGPIBObject(InstrumentSessionBase):
         if withTimeout is None:
             withTimeout = self.timeout
 
+        if wait_time != 0:
+            time.sleep(wait_time) #Adds some mandatory wait time
+
         # checking if message is available in small increments
         currenttime = time.time()
         expirationtime = currenttime + withTimeout
@@ -299,7 +302,8 @@ class PrologixGPIBObject(InstrumentSessionBase):
             status_byte = self.spoll()
             # MAV indicates that the message is available
             MAV = (status_byte >> 4) & 1
-            if MAV == 1:
+            if True:
+            #if MAV == 1:
                 retStr = self._prologix_rm.query('++read eoi')
                 return retStr.rstrip()
             # ask for the message in small increments
