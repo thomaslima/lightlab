@@ -385,3 +385,24 @@ class Keithley_2606B_SMU(VISAInstrumentDriver):
         self.__setSourceMode(isCurrentSource=True)
         self.setProtectionVoltage(protectionVoltage)
         self._configCurrent(0)
+
+    def getFilterParams(self):
+        filters = ['', 'Repeat Average', 'Moving Average', 'Median']
+
+        enable_str = self.query_print(f"{self.smu_full_string}.measure.filter.enable")
+        type_str = self.query_print(f"{self.smu_full_string}.measure.filter.type")
+        count_str = self.query_print(f"{self.smu_full_string}.measure.filter.count")
+        
+        return True if int(enable_str) else False, filters[int(type_str)], int(count_str)
+    
+    def enableFilter(self):
+        self.write(f"{self.smu_full_string}.measure.filter.enable = {self.smu_full_string}.FILTER_ON")
+
+    def disableFilter(self):
+        self.write(f"{self.smu_full_string}.measure.filter.enable = {self.smu_full_string}.FILTER_OFF")
+
+    def setFilterRepeat(self):
+        self.write(f"{self.smu_full_string}.measure.filter.type = {self.smu_full_string}.FILTER_REPEAT_AVG")
+
+    def setFilterCount(self, count):
+        self.write(f"{self.smu_full_string}.measure.filter.count = {count}")
