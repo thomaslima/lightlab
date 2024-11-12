@@ -14,7 +14,7 @@ class HP_83712B_CWG(VISAInstrumentDriver):
         self.write('*RST')
 
     def enable(self, newState=None):
-        trueWords = [True, 1, '1', 'ON']
+        trueWords = [True, 1, '1', 'ON', "+1"]
         if newState is not None:
             if newState:
                 self.write(f"OUTP ON")
